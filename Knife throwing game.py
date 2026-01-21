@@ -1,5 +1,6 @@
 import pgzrun
 import random
+from pgzero import actor, screen, keyboard
 
 HEIGHT=400
 WIDTH=500
@@ -7,6 +8,7 @@ WIDTH=500
 knife = Actor("knife")
 apple = Actor("apple")
 apple.x = random.randint(0,450)
+apple.y = 100
 knife.y = 340
 knife.x = 220
 knifethrow = False
@@ -20,23 +22,12 @@ def draw():
     apple.draw()
 
 def apples():
-    pass
-
-def move():
-    global speed
-    apple.x += speed
-    if apple.x <= 10:
-        speed = 1.5
-    if apple.x >= 450:
-        speed = -1.5    
+    pass    
         
-    
-
 
 def update():
     global knifethrow
     global score
-    move()
     if keyboard.left and knifethrow == False:
         knife.x -= 10
     if keyboard.right and knifethrow == False:
@@ -54,14 +45,6 @@ def update():
         knife.y = 340
         knife.x = 220
         knifethrow = False
-
-
-
-
-
-
-
-
 
 
 
