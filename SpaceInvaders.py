@@ -10,12 +10,20 @@ class Spaceship(pygame.sprite.Sprite):
         self.image = pygame.image.load("images/spaceship.png")
         self.rect = self.image.get_rect()
         self.rect.center = [x,y]
+        self.lastshot = pygame.time.get_ticks()
     def move(self):
+        cooldown = 500
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT]:
             self.rect.x -= 1
         if key[pygame.K_RIGHT]:
-            self.rect.x += 1    
+            self.rect.x += 1 
+        current_time = pygame.time.get_ticks()   
+        if key[pygame.K_SPACE] and current_time - self.lastshot > cooldown:
+            bullet1 = Bullet(self.rect.centerx,350)
+            bullet_group.add(bullet1)
+            self.lastshot = current_time
+            
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self,x,y):
@@ -23,6 +31,13 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load("images/enemy.png")
         self.rect = self.image.get_rect()
         self.rect.center = [x,y]
+        self.pos = float(self.rect.y)
+        self.velocity = 0
+        self.gravity = 0.001
+    def update(self):
+        self.velocity += self.gravity
+        self.pos += self.velocity
+        self.rect.y = int(self.pos)
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self,x,y):
@@ -32,9 +47,17 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = [x,y]
     def update(self):
         self.rect.y -= 3
+        if pygame.sprite.spritecollide(self,enemy_group,True):
+            self.kill()
 
-
-
+class Enemy_Bullet(pygame.sprite.Sprite):
+    def __init__(self,x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("images/laser.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x,y]
+    def update(self):
+        self.rect.y += 3
 
 
 spaceship1 = Spaceship(150,350)
@@ -42,17 +65,27 @@ spaceship1 = Spaceship(150,350)
 spaceship_group = pygame.sprite.Group()
 spaceship_group.add(spaceship1)
 
+enemy_group = pygame.sprite.Group()
 
 bullet_group = pygame.sprite.Group()
+
+def enemies():
+    for g in range(3):
+        for i in range(7):
+            enemy2 = Enemy(i * 50 + 50,50*g+50)
+            enemy_group.add(enemy2)
+
+    
+        
+enemies()
 
 while True:
     screen.blit(background,(0,0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-        if event.type == pygame.K_SPACE:
-            bullet1 = Bullet(spaceship1.rect.x,350)
-            bullet_group.add(bullet1)
+    enemy_group.draw(screen)   
+    enemy_group.update()
     bullet_group.draw(screen)
     bullet_group.update()
     spaceship_group.draw(screen)        
