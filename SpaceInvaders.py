@@ -16,6 +16,7 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [x,y]
         self.lastshot = pygame.time.get_ticks()
+        self.lives = 3
     def move(self):
         global GameOver
         cooldown = 500
@@ -32,6 +33,10 @@ class Spaceship(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self,enemy_group,True):
             self.kill()
             GameOver = True
+        d = pygame.sprite.spritecollide(self,enemybullet_group,True)
+        for i in d:
+           self.lives -= 1
+           break
             
 
 class Enemy(pygame.sprite.Sprite):
@@ -88,9 +93,7 @@ def enemies():
         for i in range(7):
             enemy2 = Enemy(i * 50 + 50,50*g+50)
             enemy_group.add(enemy2)
-
-    
-        
+   
 enemies()
 
 lasts = pygame.time.get_ticks()
@@ -122,6 +125,10 @@ while True:
     enemybullet_group.update()
     a = font.render("Score:" +str(score),True,"red")
     screen.blit(a,(300,50))
+    if spaceship1.lives == 0:
+        GameOver = True
+    f = font.render("Lives =" +str(spaceship1.lives),True,"blue")
+    screen.blit(f,(50,50))
     pygame.display.update()
     
-    
+     
